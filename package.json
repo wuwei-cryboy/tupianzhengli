@@ -1,0 +1,13 @@
+{
+  "name": "pmndrs-cards",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "pmndrs cards 复刻版 - 3D 卡片环绕墙，支持图片上传、AI 分类、PWA 离线访问",
+  "scripts": {
+    "dev": "python -m http.server 8080",
+    "start": "python -m http.server 8080",
+    "check": "node --check src/main.js && node --check src/scene.js && node --check src/lib/*.js"
+  },
+  "keywords": ["threejs", "webgl", "cards", "3d", "pwa"],
+  "license": "MIT"
+}

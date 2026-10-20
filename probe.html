@@ -1,0 +1,7 @@
+﻿<!doctype html><html><body style="margin:0;background:#111">
+<canvas id="c" width="400" height="300"></canvas>
+<script>
+const gl=document.getElementById('c').getContext('webgl2');
+if(gl){gl.clearColor(0.9,0.3,0.2,1);gl.clear(gl.COLOR_BUFFER_BIT);document.title='WEBGL2 OK';}
+else{document.title='NO WEBGL2';}
+</script></body></html>

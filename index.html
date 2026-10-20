@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>cards — pmndrs/examples 复刻</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="./favicon.ico" sizes="any">
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js"
+        }
+      }
+    </script>
+    <style>
+      /* 开场视频遮罩 */
+      #intro-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+      }
+      #intro-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      #intro-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #intro-skip {
+        position: absolute;
+        bottom: 2rem;
+        right: 2rem;
+        padding: 0.5rem 1.5rem;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.4);
+        color: #fff;
+        font-size: 0.875rem;
+        border-radius: 999px;
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        transition: background 0.2s ease;
+        z-index: 1;
+      }
+      #intro-skip:hover {
+        background: rgba(255,255,255,0.4);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #intro-overlay {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 开场视频遮罩 -->
+    <div id="intro-overlay">
+      <video id="intro-video" playsinline muted preload="auto">
+        <source src="./assets/intro.mp4" type="video/mp4">
+      </video>
+      <button id="intro-skip" aria-label="跳过开场动画">跳过</button>
+    </div>
+
+    <div id="root">
+      <canvas id="scene"></canvas>
+
+      <!-- 2D 平铺模式容器 -->
+      <div class="grid-view" id="grid-view" hidden>
+        <header class="grid-header">
+          <h2 id="grid-title">全部图片</h2>
+          <button class="back-btn" id="back-to-3d" aria-label="返回 3D 环形">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 5l-7 7 7 7"></path>
+            </svg>
+            <span>返回 3D 环形</span>
+          </button>
+        </header>
+        <div class="grid-container" id="grid-container"></div>
+      </div>
+
+      <!-- 大图预览模态框 -->
+      <div class="modal-overlay" id="modal-overlay" hidden>
+        <div class="modal-content">
+          <button class="modal-close" id="modal-close" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <img class="modal-image" id="modal-image" alt="预览图片">
+          <div class="modal-info">
+            <h3 class="modal-title" id="modal-title"></h3>
+            <p class="modal-meta" id="modal-meta"></p>
+            <div class="modal-category-selector">
+              <label for="modal-category-select">分类：</label>
+              <select id="modal-category-select" aria-label="修改图片分类"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 覆盖层：与示例中的绝对定位信息层等价 -->
+      <div class="overlay">
+        <header class="hud hud--tl">
+          <h1>cards</h1>
+          <p id="hint">
+            <span>上下滚动 / 拖动</span> 旋转卡片环 · <span>悬停</span> 放大并展开大图<br>
+            <span>点击分类</span> 进入平铺模式 · <span>双击</span> 返回 3D
+          </p>
+        </header>
+
+        <div class="hud hud--tr">
+          <span id="stats">—</span>
+          <span id="fps" class="dim"></span>
+        </div>
+
+        <nav class="chips" id="chips" aria-label="季节分组"></nav>
+      </div>
+
+      <!-- 隐藏的文件输入，用于点击上传 -->
+      <input type="file" id="file-input" accept="image/*" multiple hidden>
+
+      <div class="boot" id="boot">
+        <div class="boot__inner">
+          <span class="boot__dot"></span>
+          <span id="boot-text">正在构建卡片环…</span>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      // 加载主模块（注册 window.startInitScene 等）
+      try {
+        await import('./src/main.js')
+      } catch (err) {
+        console.error('[index] 加载 main.js 失败:', err)
+        const boot = document.getElementById('boot')
+        const bootText = document.getElementById('boot-text')
+        if (boot) {
+          boot.classList.add('boot--error')
+          if (bootText) bootText.textContent = '场景启动失败：' + (err && err.message ? err.message : String(err))
+        }
+      }
+
+      // 开场视频控制
+      (() => {
+        const overlay = document.getElementById('intro-overlay')
+        const video = document.getElementById('intro-video')
+        const skipBtn = document.getElementById('intro-skip')
+
+        function hideIntro() {
+          overlay.classList.add('hidden')
+          // 延迟移除 DOM，等过渡动画完成
+          setTimeout(() => overlay.remove(), 800)
+        }
+
+        // 立即启动 Three.js 场景初始化（不等待视频播放）
+        // main.js 在模块加载结束时已自动调用 startInitScene()，这里做兜底
+        if (typeof window.startInitScene === 'function') window.startInitScene()
+
+        // 视频播放结束
+        video.addEventListener('ended', hideIntro)
+
+        // 跳过按钮
+        skipBtn?.addEventListener('click', hideIntro)
+
+        // 点击视频区域也可跳过
+        video.addEventListener('click', hideIntro)
+
+        // 视频加载失败时直接跳过
+        video.addEventListener('error', hideIntro)
+
+        // 尝试自动播放
+        video.play().catch(() => {
+          // 自动播放被阻止，等待用户交互
+          video.muted = true
+          video.play().catch(() => {
+            // 仍然失败，显示播放提示
+            skipBtn.textContent = '点击播放'
+            skipBtn.onclick = () => {
+              video.play().then(() => { skipBtn.textContent = '跳过' })
+            }
+          })
+        })
+      })()
+
+      // PWA: 注册 Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('[PWA] SW registered:', reg.scope))
+          .catch(err => console.warn('[PWA] SW registration failed:', err));
+      }
+    </script>
+  </body>
+</html>

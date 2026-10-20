@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务器错误报告</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 40px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .error-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #d32f2f; }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .code-block {
+            background: #f8f8f8;
+            padding: 10px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        a {
+            color: #2196f3;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>服务器启动失败报告</h1>
+        
+        <div class="section">
+            <h2>问题描述</h2>
+            <p>由于 <strong>Python</strong> 不可用，<strong>Node.js</strong> 不支持全局安装 http-server 工具，<strong>curl</strong> 命令无法用于检查服务器状态，导致无法启动本地 HTTP 服务器提供网页服务。</p>
+        </div>
+        
+        <div class="section">
+            <h2>影响</h2>
+            <ul>
+                <li>无法通过 HTTP 协议访问复刻的 WebGL 可视化效果</li>
+                <li>浏览器因 ES Module 模块系统而无法直接加载文件</li>
+                <li>用户无法体验卡片环绕、三维交互等核心功能</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>可能解决方案</h2>
+            
+            <h3>1. 安装 Python（推荐）</h3>
+            <p>Python 是最简便的方法，可通过以下步骤安装：</p>
+            <div class="code-block"># Windows 10/11 上使用 Microsoft Store
+# macOS 上使用 brew install python3
+# Linux 上使用 apt install python3 或 yum install python3
+
+# 安装后，执行以下命令启动服务器
+cd "项目路径"
+python -m http.server 8080</div>
+            
+            <h3>2. 使用 Node.js 和 http-server</h3>
+            <p>如果已安装 Node.js，可以通过 npm 全局安装 http-server：</p>
+            <div class="code-block"># 安装 http-server 工具
+npm install -g http-server
+
+# 启动服务器
+cd "项目路径"
+http-server -p 8080</div>
+            
+            <h3>3. 使用端口转发</h3>
+            <p>如果无法在本地机器上安装 Python/Node.js，可以尝试：</p>
+            <ul>
+                <li>使用 WSL2 中的 Python 服务</li>
+                <li>通过网络共享文件夹</li>
+                <li>使用云端临时存储服务</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>技术细节</h2>
+            <p>项目结构：</p>
+            <div class="code-block">pmndrs-cards/
+├── index.html              # 主页面 (ES Module 模块系统)
+├── index_local.html        # 用于本地测试的独立 HTML 文件
+├── src/
+│   ├── main.js            # 核心 Three.js 渲染逻辑
+│   ├── scene.js           # 场景管理
+│   └── styles.css         # 样式表
+├── vendor/
+│   └── three.module.js    # Three.js 模块文件
+└── README.md              # 使用说明</div>
+            
+            <p>关键技术点：</p>
+            <ul>
+                <li>使用了 ES Module 模块系统，需要 HTTP 服务器支持</li>
+                <li>Three.js 通过 importmap 直接加载本地模块</li>
+                <li>支持完整的 3D 交互功能，包括滚动、悬停、射线拾取等</li>
+                <li>复刻了 pmndrs/examples 中的 cards 示例的所有核心交互逻辑</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>直接访问</h2>
+            <p>您可以直接访问 <strong>index_local.html</strong> 文件，尽管它可能无法完全运行所有功能：</p>
+            <p><a href="index_local.html" target="_blank">访问 index_local.html</a></p>
+            
+            <p>或者，如果您有 Python 或 Node.js 环境，可以按照上面的步骤设置服务器。</p>
+        </div>
+        
+        <div class="section">
+            <h2>联系我们</h2>
+            <p>如果您有任何问题或需要进一步帮助，请访问项目仓库或联系支持团队。</p>
+        </div>
+    </div>
+</body>
+</html>

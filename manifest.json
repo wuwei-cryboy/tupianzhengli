@@ -1,0 +1,27 @@
+{
+  "name": "pmndrs Cards - 图片分类卡片墙",
+  "short_name": "Cards",
+  "description": "3D 卡片环绕墙，支持图片上传、AI 分类、PWA 离线访问",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fdfdfd",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23e8b059'/%3E%3Cpath d='M25 50 L40 65 L75 35' stroke='white' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["photo", "utilities"],
+  "shortcuts": [
+    {
+      "name": "上传图片",
+      "short_name": "上传",
+      "description": "拖拽或选择图片上传",
+      "url": "./index.html#upload"
+    }
+  ]
+}

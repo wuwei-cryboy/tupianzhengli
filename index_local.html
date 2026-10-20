@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>cards — pmndrs/examples 复刻</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <canvas id="scene"></canvas>
+
+      <!-- 覆盖层：与示例中的绝对定位信息层等价 -->
+      <div class="overlay">
+        <header class="hud hud--tl">
+          <h1>cards</h1>
+          <p id="hint">
+            <span>上下滚动 / 拖动</span> 旋转卡片环 · <span>悬停</span> 放大并展开大图
+          </p>
+        </header>
+
+        <div class="hud hud--tr">
+          <span id="stats">—</span>
+          <span id="fps" class="dim"></span>
+        </div>
+
+        <div class="hud hud--bl">
+          <p>使用 <code>home</code>/<code>end</code> 跳转</p>
+        </div>
+
+        <div class="hud hud--br">
+          <span id="clock">01/2024</span>
+        </div>
+
+        <!-- 分组快捷跳转（扩展交互） -->
+        <div id="chips" class="chips"></div>
+      </div>
+
+      <div class="boot" id="boot">
+        <div class="boot__inner">
+          <span class="boot__dot"></span>
+          <span id="boot-text">正在构建卡片环…</span>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      // 模块加载失败（例如无网络、CDN 不可达）时给出可读提示，而不是空白页
+      const boot = document.getElementById('boot')
+      const bootText = document.getElementById('boot-text')
+      try {
+        await import('./src/main.js')
+      } catch (error) {
+        console.error(error)
+        boot.classList.add('boot--error')
+        bootText.textContent =
+          '场景启动失败：' +
+          (error && error.message ? error.message : String(error)) +
+          ' —— 需要通过本地 HTTP 服务打开（ES Module 不支持 file://），例如在该目录执行 python -m http.server。'
+      }
+    </script>
+  </body>
+</html>
